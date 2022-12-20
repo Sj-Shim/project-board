@@ -3,7 +3,6 @@ package com.bitstudy.app.domain;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.loader.collection.OneToManyJoinWalker;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -11,9 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.LinkedHashSet;
 import java.util.Objects;
-import java.util.Set;
 
 /** Lombok 사용
  * 주의 : maven때와 같은 방식인 것들도 이름이 다르게 되어있음. 헷갈림 주의
@@ -37,7 +34,7 @@ import java.util.Set;
         //@Index : 데이터베이스 인덱스는 추가, 쓰기 및 저장공간을 희생해서 테이블에 대한 데이터 검색 속도를
         //      향상시키는 데이터 구조. @Entity와 세트로 사용
 })
-public class Article {
+public class Ex01_1_Article_Entity {
     @Id //전체 필드 중 PK가 무엇인지 선언. 없으면 @Entity 에러난다
     @GeneratedValue(strategy = GenerationType.IDENTITY) //해당 필드가 auto_increment인 경우 @Generatedvalue 써서 자동으로 값이 생성되게 해줘야 함. 기본키 전략
     private Long id;
@@ -48,24 +45,8 @@ public class Article {
     //접근할 수 있는 필드에 제한을 주기 위함(id의 경우 JPA에서 자동으로 부여하는 번호, 메타데이터도 JPA가 자동으로 세팅해 줄 내용들임. 그래서 사용자/개발자가 건들지 못하게 하기 위함. Setter는 필요한 필드에만 부여하는 것이 좋음
     //@Column : 해당 컬럼이 not null인 경우(@Column(nullable=false) 작성
     // 기본값은 true라서 안쓰면 null 가능. length = 바이트수(숫자) 안쓰면 기본값 255 적용
-
-    /* 양방향 바인딩 */
-    @OrderBy("id")
-    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
-    @ToString.Exclude /* ** 상단 @ToString 어노테이션 마우스오버시 @ToString includes ~ lazy load...
-       퍼포먼스, 메모리 저하 유발할 수 있어 성능에 악영향가능성. 그래서 해당 필드를 가려달라는 요청*/
-    private final Set<ArticleComment> articleComments = new LinkedHashSet<>();
-    /* ** 순환참조 : @ToString.Exclude 안해주면 순환참조 이슈가 생길 수 있음.
-    * 여기서 ToString이 id, title, content, hashtag 찍고 Set<ArticleComment>부분 찍으려고
-    * ArticleComment.java 파일에 가서 거기 있는 @ToSTring이 요소들을 다 찍으려고 하면서 요소들 중
-    * private Article article을 보는 순간 다시 Article을 참조. Article의 @ToString이 재동작...
-    * 그래서 @ToString.Exclude 필수
-    * Article에서 달아주는 이유는 댓글은 글에 종속되있지만 글이 댓글에 종속되는 것은 아니기 때문
-    * (글이 댓글을 참조하는 건 일반적인 경우가 아니기 때문)*/
-    public void addComment(ArticleComment comment){
-        this.articleComments.add(comment);
-    }
     //메타데이터
+
     /** JPA Auditing : jpa에서 자동으로 세팅하게 해줄 때 사용하는 기능
      *  config 파일이 별도로 필요함 config 패키지 만들어서 JpaConfig 클래스 만들기
      *  */
@@ -93,15 +74,15 @@ public class Article {
 
     /** Entity를 만들 때는 무조건 기본 생성자가 필요
      * public 또는 protected만 가능. 어디에서도 기본생성자는 안쓰이게 하고싶어서 protected로 변경*/
-    protected Article() { }
+    protected Ex01_1_Article_Entity() { }
     /** 사용자가 입력하는 값만 받기. 나머지는 시스템이 알아서 작성하게 만듦.*/
-    private Article(String title, String content, String hashtag) {
+    private Ex01_1_Article_Entity(String title, String content, String hashtag) {
         this.title = title;
         this.content = content;
         this.hashtag = hashtag;
     }
-    public static Article of(String title, String content, String hashtag){
-        return new Article(title, content, hashtag);
+    public static Ex01_1_Article_Entity of(String title, String content, String hashtag){
+        return new Ex01_1_Article_Entity(title, content, hashtag);
     }
     /* 정적 팩토리 메서드 (factory method pattern 중 하나)
     * : 객체생성 역할을 하는 클래스 메서드라는 뜻
@@ -131,7 +112,7 @@ public class Article {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Article article = (Article) o;
+        Ex01_1_Article_Entity article = (Ex01_1_Article_Entity) o;
         return id.equals(article.id);
     }
 
