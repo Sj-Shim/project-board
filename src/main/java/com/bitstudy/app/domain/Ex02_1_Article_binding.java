@@ -21,7 +21,7 @@ import java.util.Set;
  * 2) getter/setter, toString등의 롬복 어노테이션 사용
  * 3) 동등성, 동일성 비교할 수 있는 코드 사용해보기
  * */
-@Entity // 롬복을 이용해서 클래스를 엔티티로 변경 @Entity가 붙은 클래스는 JPA가 관리하게 된다.
+//@Entity // 롬복을 이용해서 클래스를 엔티티로 변경 @Entity가 붙은 클래스는 JPA가 관리하게 된다.
         // 그래서 기본키(PK) 뭔지 알려줘야 하는 것.(@Id)
 @Getter // getter/setter toString 등의 롬복 어노테이션 사용시 자동으로 모든 필드의 메서드 생성됨
 @ToString

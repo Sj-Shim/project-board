@@ -8,6 +8,7 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -21,7 +22,11 @@ import java.util.Set;
  * 1) 롬복을 이용해서 클래스를 엔티티로 변경
  * 2) getter/setter, toString등의 롬복 어노테이션 사용
  * 3) 동등성, 동일성 비교할 수 있는 코드 사용해보기
+ *
+ * JPA : 자바 ORM 기술 표준. Entity를 분석, create나 insert같은 sql쿼리를 생성해준다.
+ * JDBC API를 사용해서 Db접근도 해주고 객체와 테이블을 매핑해준다.
  * */
+@EntityListeners(AuditingEntityListener.class)
 @Entity // 롬복을 이용해서 클래스를 엔티티로 변경 @Entity가 붙은 클래스는 JPA가 관리하게 된다.
         // 그래서 기본키(PK) 뭔지 알려줘야 하는 것.(@Id)
 @Getter // getter/setter toString 등의 롬복 어노테이션 사용시 자동으로 모든 필드의 메서드 생성됨
@@ -50,7 +55,7 @@ public class Article {
     // 기본값은 true라서 안쓰면 null 가능. length = 바이트수(숫자) 안쓰면 기본값 255 적용
 
     /* 양방향 바인딩 */
-    @OrderBy("id")
+    @OrderBy("id") //양방향 바인딩의 정렬 기준을 id로 .
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     @ToString.Exclude /* ** 상단 @ToString 어노테이션 마우스오버시 @ToString includes ~ lazy load...
        퍼포먼스, 메모리 저하 유발할 수 있어 성능에 악영향가능성. 그래서 해당 필드를 가려달라는 요청*/
@@ -100,6 +105,11 @@ public class Article {
         this.content = content;
         this.hashtag = hashtag;
     }
+    /*접근 제한자 정리
+    * public : 어디에서나 접근 가능
+    * private : 해당 클래스 외에는 접근 불가
+    * protected : 같은 패키지 및 상속 클래스에서 접근 가능
+    * default : 같은 패키지에서 접근 가능 */
     public static Article of(String title, String content, String hashtag){
         return new Article(title, content, hashtag);
     }
