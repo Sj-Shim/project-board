@@ -25,7 +25,7 @@ public class ArticleComment {
     private Long id;
     @Setter
     @ManyToOne(optional = false)
-    @JoinColumn(name = "articleId")
+//    @JoinColumn(name = "articleId")
     private Article article; // 연관관계 매핑
     /** 연관관계 매핑
      * 연관관계 없이 만들면 private Long articleId; 식으로 하게 된다.(관계형 DB스타일)

@@ -3,12 +3,10 @@ package com.bitstudy.app.domain;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.loader.collection.OneToManyJoinWalker;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -22,12 +20,8 @@ import java.util.Set;
  * 1) 롬복을 이용해서 클래스를 엔티티로 변경
  * 2) getter/setter, toString등의 롬복 어노테이션 사용
  * 3) 동등성, 동일성 비교할 수 있는 코드 사용해보기
- *
- * JPA : 자바 ORM 기술 표준. Entity를 분석, create나 insert같은 sql쿼리를 생성해준다.
- * JDBC API를 사용해서 Db접근도 해주고 객체와 테이블을 매핑해준다.
  * */
-@EntityListeners(AuditingEntityListener.class)
-@Entity // 롬복을 이용해서 클래스를 엔티티로 변경 @Entity가 붙은 클래스는 JPA가 관리하게 된다.
+//@Entity // 롬복을 이용해서 클래스를 엔티티로 변경 @Entity가 붙은 클래스는 JPA가 관리하게 된다.
         // 그래서 기본키(PK) 뭔지 알려줘야 하는 것.(@Id)
 @Getter // getter/setter toString 등의 롬복 어노테이션 사용시 자동으로 모든 필드의 메서드 생성됨
 @ToString
@@ -42,7 +36,7 @@ import java.util.Set;
         //@Index : 데이터베이스 인덱스는 추가, 쓰기 및 저장공간을 희생해서 테이블에 대한 데이터 검색 속도를
         //      향상시키는 데이터 구조. @Entity와 세트로 사용
 })
-public class Article {
+public class Ex02_1_Article_binding {
     @Id //전체 필드 중 PK가 무엇인지 선언. 없으면 @Entity 에러난다
     @GeneratedValue(strategy = GenerationType.IDENTITY) //해당 필드가 auto_increment인 경우 @Generatedvalue 써서 자동으로 값이 생성되게 해줘야 함. 기본키 전략
     private Long id;
@@ -55,7 +49,7 @@ public class Article {
     // 기본값은 true라서 안쓰면 null 가능. length = 바이트수(숫자) 안쓰면 기본값 255 적용
 
     /* 양방향 바인딩 */
-    @OrderBy("id") //양방향 바인딩의 정렬 기준을 id로 .
+    @OrderBy("id")
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     @ToString.Exclude /* ** 상단 @ToString 어노테이션 마우스오버시 @ToString includes ~ lazy load...
        퍼포먼스, 메모리 저하 유발할 수 있어 성능에 악영향가능성. 그래서 해당 필드를 가려달라는 요청*/
@@ -98,20 +92,15 @@ public class Article {
 
     /** Entity를 만들 때는 무조건 기본 생성자가 필요
      * public 또는 protected만 가능. 어디에서도 기본생성자는 안쓰이게 하고싶어서 protected로 변경*/
-    protected Article() { }
+    protected Ex02_1_Article_binding() { }
     /** 사용자가 입력하는 값만 받기. 나머지는 시스템이 알아서 작성하게 만듦.*/
-    private Article(String title, String content, String hashtag) {
+    private Ex02_1_Article_binding(String title, String content, String hashtag) {
         this.title = title;
         this.content = content;
         this.hashtag = hashtag;
     }
-    /*접근 제한자 정리
-    * public : 어디에서나 접근 가능
-    * private : 해당 클래스 외에는 접근 불가
-    * protected : 같은 패키지 및 상속 클래스에서 접근 가능
-    * default : 같은 패키지에서 접근 가능 */
-    public static Article of(String title, String content, String hashtag){
-        return new Article(title, content, hashtag);
+    public static Ex02_1_Article_binding of(String title, String content, String hashtag){
+        return new Ex02_1_Article_binding(title, content, hashtag);
     }
     /* 정적 팩토리 메서드 (factory method pattern 중 하나)
     * : 객체생성 역할을 하는 클래스 메서드라는 뜻
@@ -141,7 +130,7 @@ public class Article {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Article article = (Article) o;
+        Ex02_1_Article_binding article = (Ex02_1_Article_binding) o;
         return id.equals(article.id);
     }
 
