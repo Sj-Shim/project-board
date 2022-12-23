@@ -26,7 +26,23 @@ import java.util.Set;
  * JPA : 자바 ORM 기술 표준. Entity를 분석, create나 insert같은 sql쿼리를 생성해준다.
  * JDBC API를 사용해서 Db접근도 해주고 객체와 테이블을 매핑해준다.
  * */
-@EntityListeners(AuditingEntityListener.class)
+/** Article과 ArticleComment에 있는 공통 필드(메타데이터) 별도로 관리하기
+ * 이유 : 앞으로 fk로 엮인 테이블을 만들 경우 모든 domain 안에 있는 파일들에 많은 중복 코드들이 생김
+ *  그래서 별도의 파일에 공통되는 부분을 몰아 넣는 연습.
+ * 참고 : 공통코드 빼는 것은 팀마다 다르다.
+ *  장점 :유지보수
+ *  단점 : 힘들다
+ *
+ *  중복코드 분리 안할 경우 장점 : 각 파일에 모든 정보가 다 있어서 파악하기 좋음. 변경시 유연한 코드작업 가능
+ *
+ *  추출 방법
+ *  1) @Embedded - 공통되는 필드들을 하나의 클래스로 만들어서 @Embedded 있는 곳에서 하는 방식
+ *  2) @MappedSuperClass - (요즘 실무에서 사용) @MappedSuperClass 어노테이션 붙은 곳에서 사용
+ *   차이 : @Embedded 방식 - 필드가 하나 추가된다.
+ *      영속성 컨텍스트를 통해 데이터를 넘겨 받아서 어플리케이션으로 열었을 때는 어짜피 AuditingField와 똑같이 보임
+ *          @MappedSuperClass는 표준 JPA에서 제공해주는 클래스. 중간단계 따로 없이 바로 동작.
+ * */
+//@EntityListeners(AuditingEntityListener.class)
 @Entity // 롬복을 이용해서 클래스를 엔티티로 변경 @Entity가 붙은 클래스는 JPA가 관리하게 된다.
         // 그래서 기본키(PK) 뭔지 알려줘야 하는 것.(@Id)
 @Getter // getter/setter toString 등의 롬복 어노테이션 사용시 자동으로 모든 필드의 메서드 생성됨
@@ -42,7 +58,7 @@ import java.util.Set;
         //@Index : 데이터베이스 인덱스는 추가, 쓰기 및 저장공간을 희생해서 테이블에 대한 데이터 검색 속도를
         //      향상시키는 데이터 구조. @Entity와 세트로 사용
 })
-public class Article {
+public class Article extends AuditingFields {
     @Id //전체 필드 중 PK가 무엇인지 선언. 없으면 @Entity 에러난다
     @GeneratedValue(strategy = GenerationType.IDENTITY) //해당 필드가 auto_increment인 경우 @Generatedvalue 써서 자동으로 값이 생성되게 해줘야 함. 기본키 전략
     private Long id;
@@ -74,21 +90,21 @@ public class Article {
     /** JPA Auditing : jpa에서 자동으로 세팅하게 해줄 때 사용하는 기능
      *  config 파일이 별도로 필요함 config 패키지 만들어서 JpaConfig 클래스 만들기
      *  */
-    @CreatedDate
-    @Column(nullable = false)
-    private LocalDateTime registerDate; //생성일자
-
-    @CreatedBy
-    @Column(nullable = false, length = 100)
-    private String createdBy; // 생성자
-    // 생성일시 같은 다른 것들은 알아낼 수 있는데, 최초 생성자는 (현재 코드상태 상)인증받고 오지 않아서 따로 알아낼 수 없음. 이때 아까 만든 jpaConfig 파일을 사용.
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime modifiedDate; // 수정일자
-
-    @LastModifiedBy
-    @Column(nullable = false, length = 100)
-    private String modifiedBy; // 수정자
+//    @CreatedDate
+//    @Column(nullable = false)
+//    private LocalDateTime registerDate; //생성일자
+//
+//    @CreatedBy
+//    @Column(nullable = false, length = 100)
+//    private String createdBy; // 생성자
+//    // 생성일시 같은 다른 것들은 알아낼 수 있는데, 최초 생성자는 (현재 코드상태 상)인증받고 오지 않아서 따로 알아낼 수 없음. 이때 아까 만든 jpaConfig 파일을 사용.
+//    @LastModifiedDate
+//    @Column(nullable = false)
+//    private LocalDateTime modifiedDate; // 수정일자
+//
+//    @LastModifiedBy
+//    @Column(nullable = false, length = 100)
+//    private String modifiedBy; // 수정자
     /**  위처럼 어노테이션 붙여주기만 하면 auditing이 작동
      * @CreateDate : 최초에 insert 할 때 자동으로 한번 넣어줌
      * @CreateBy
