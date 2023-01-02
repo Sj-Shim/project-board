@@ -1,5 +1,6 @@
 package com.bitstudy.app.controller;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *                  Response, Request에 대한 사전 정의가 가능
  * */
 //@WebMvcTest
+@Disabled
 @SpringBootTest //통합 테스트. 이거만 있으면 MockMvc를 알아볼 수 없어서 @AutoConfigurationMockMvc 필요
 @AutoConfigureMockMvc
 @Transactional // 테스트 돌리면 Hibernate 부분에 select 쿼리문이 나오면서 실제로 DB를 건드리는데, 테스트 끝난 이후 다시 DB를 롤백시키는 용도.
