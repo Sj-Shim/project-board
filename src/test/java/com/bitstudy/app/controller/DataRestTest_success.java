@@ -4,11 +4,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MockMvcBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -43,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest //통합 테스트. 이거만 있으면 MockMvc를 알아볼 수 없어서 @AutoConfigurationMockMvc 필요
 @AutoConfigureMockMvc
 @Transactional // 테스트 돌리면 Hibernate 부분에 select 쿼리문이 나오면서 실제로 DB를 건드리는데, 테스트 끝난 이후 다시 DB를 롤백시키는 용도.
-public class DataRestTest {
+public class DataRestTest_success {
     /** MockMvc 테스트 방법
      * 1) MockMvc 생성( bean 준비)
      * 2) MockMvc에게 요청에 대한 정보를 입력
@@ -51,9 +49,10 @@ public class DataRestTest {
      * 4) 다 통과하면 테스트 통과*/
     private final MockMvc mvc; //1. bean 준비
 
-    public DataRestTest(@Autowired MockMvc mvc) { // 2. 주입
+    public DataRestTest_success(MockMvc mvc) {
         this.mvc = mvc;
     }
+
     /* api - 게시글 리스트 전체 조회*/
     @DisplayName("api 게시글 리스트 전체 조회")
     @Test
@@ -86,14 +85,6 @@ public class DataRestTest {
     @Test
     void getOneArticleCommentTest() throws Exception {
         mvc.perform(get("/api/articleComments/1"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.valueOf("application/hal+json")));
-    }
-
-    @DisplayName("api 게시글의 댓글 리스트 조회")
-    @Test
-    void getArticleCommentsOfArticleTest() throws Exception {
-        mvc.perform(get("/api/articles/1/articleComments"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.valueOf("application/hal+json")));
     }

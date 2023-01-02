@@ -3,13 +3,9 @@ package com.bitstudy.app.controller;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MockMvcBuilder;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -39,11 +35,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *                  테스트 코드 내에서 Mock 서버를 띄울 수 있다.
  *                  Response, Request에 대한 사전 정의가 가능
  * */
-//@WebMvcTest
-@SpringBootTest //통합 테스트. 이거만 있으면 MockMvc를 알아볼 수 없어서 @AutoConfigurationMockMvc 필요
-@AutoConfigureMockMvc
-@Transactional // 테스트 돌리면 Hibernate 부분에 select 쿼리문이 나오면서 실제로 DB를 건드리는데, 테스트 끝난 이후 다시 DB를 롤백시키는 용도.
-public class DataRestTest {
+@WebMvcTest
+public class DataRestTest_fail {
     /** MockMvc 테스트 방법
      * 1) MockMvc 생성( bean 준비)
      * 2) MockMvc에게 요청에 대한 정보를 입력
@@ -51,50 +44,31 @@ public class DataRestTest {
      * 4) 다 통과하면 테스트 통과*/
     private final MockMvc mvc; //1. bean 준비
 
-    public DataRestTest(@Autowired MockMvc mvc) { // 2. 주입
+    public DataRestTest_fail(@Autowired MockMvc mvc) { // 2. 주입
         this.mvc = mvc;
     }
     /* api - 게시글 리스트 전체 조회*/
     @DisplayName("api 게시글 리스트 전체 조회")
     @Test
     void getAllArticlesTest() throws Exception {
-
+        /* @WebMvcTest는 슬라이스 테스트라서 controller 외의 빈들은 로드하지 않았기 때문에
+        * 실패로 뜬다. 그래서 일단 @WebMvcTest 대신 통합테스트로 돌릴 것임*/
         mvc.perform(get("/api/articles"))//MockMvcRequestBuilder
                 //MockMvcResultMatchers
                 .andExpect(status().isOk()) //현재 200이 들어왔는지 확인
                 .andExpect(content().contentType(MediaType.valueOf("application/hal+json")));
-
-    }
-
-    @DisplayName("api 게시글 단건 조회")
-    @Test
-    void getOneArticleTest() throws Exception {
-        mvc.perform(get("/api/articles/1"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.valueOf("application/hal+json")));
-    }
-
-    @DisplayName("api 댓글 리스트 전체 조회")
-    @Test
-    void getAllArticleCommentsTest() throws Exception {
-        mvc.perform(get("/api/articleComments"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.valueOf("application/hal+json")));
-    }
-
-    @DisplayName("api 댓글 단건 조회")
-    @Test
-    void getOneArticleCommentTest() throws Exception {
-        mvc.perform(get("/api/articleComments/1"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.valueOf("application/hal+json")));
-    }
-
-    @DisplayName("api 게시글의 댓글 리스트 조회")
-    @Test
-    void getArticleCommentsOfArticleTest() throws Exception {
-        mvc.perform(get("/api/articles/1/articleComments"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.valueOf("application/hal+json")));
+        /** 특별한 import (딥 다이브)
+         * 1) perform() 안에 get 치고 ctrl + space 누르면 딥다이브 함.
+         *      * 그냥 기본으로 나오는건 getClass()인데 그거 말고 MockMvcRequestBuilder
+         *      + alt + enter해서 static import
+         *      * import statically : 필드나 메서드를 클래스를 지정하지 않고도 코드에서 사용할 수 있도록
+         *
+         * 2) andExpect(status) : status치고 ctrl space 두세번 하면 MockMvcResultMatchers.status()나옴.
+         *
+         * 3) andExpect(content().contentType())
+         *      : content 검사는 contentType으로 하고 MediaType 사용함.
+         *      valueOf 안에 들어갈 content-type은 HAL의 response headers에 있는 content-type에 있는거
+         *      복사해오기.
+         *      */
     }
 }
