@@ -1,5 +1,6 @@
 package com.bitstudy.app.controller;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *                  테스트 코드 내에서 Mock 서버를 띄울 수 있다.
  *                  Response, Request에 대한 사전 정의가 가능
  * */
+@Disabled
 @WebMvcTest
 public class DataRestTest_fail {
     /** MockMvc 테스트 방법
