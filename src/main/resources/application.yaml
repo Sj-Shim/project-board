@@ -48,3 +48,7 @@ spring:
       # ALL - 모든 레포지토리
       # annotated : 지정한 것만 노출(어노테이션 달린것)
       # visibility : 레포지토리를 public 으로 노출한 것만
+
+  thymeleaf3:
+    decoupled-logic: true
+
