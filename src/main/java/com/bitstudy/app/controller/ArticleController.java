@@ -1,8 +1,11 @@
 package com.bitstudy.app.controller;
 
+import com.bitstudy.app.domain.Article;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -28,5 +31,12 @@ public class ArticleController {
         * Model , ModelMap 차이 : Model은 인터페이스 ModelMap은 클래스(구현체). 사용법은 같음*/
         map.addAttribute("articles", List.of()); //키 : articles, 값: 그냥 list
         return "articles/index";
+    }
+
+    @GetMapping("/{articleId}")
+    public String articleOne(@PathVariable Long articleId, ModelMap map){
+        map.addAttribute("article", null);//테스트할때는 null말고 뭔가 넣어줘야함
+        map.addAttribute("articleComments", List.of());
+        return "articles/detail";
     }
 }
