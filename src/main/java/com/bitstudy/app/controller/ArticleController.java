@@ -1,7 +1,14 @@
 package com.bitstudy.app.controller;
 
+import com.bitstudy.app.domain.Article;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.List;
 
 /** 뷰 엔드포인트 관련 컨트롤러
  * (엑셀 api에 정의해놓은 view 부분 url 참조)
@@ -15,8 +22,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
  *  static 디렉터리에는 css,js, img등 정적 파일 작성.
  *
  * */
-//@Controller
+@Controller
 @RequestMapping("/articles") //모든 경로들이 /articles로 시작하므로 클래스 레벨에 걸어줌
 public class ArticleController {
-    /* BDD 하러가기*/
+    @GetMapping
+    public String articles(ModelMap map) {
+        /* ModelMap : 테스트파일에서 attribute 체크도 넣어놔서 필요함.
+        * Model , ModelMap 차이 : Model은 인터페이스 ModelMap은 클래스(구현체). 사용법은 같음*/
+        map.addAttribute("articles", List.of()); //키 : articles, 값: 그냥 list
+        return "articles/index";
+    }
+
+    @GetMapping("/{articleId}")
+    public String articleOne(@PathVariable Long articleId, ModelMap map){
+        map.addAttribute("article", null);//테스트할때는 null말고 뭔가 넣어줘야함
+        map.addAttribute("articleComments", List.of());
+        return "articles/detail";
+    }
 }
