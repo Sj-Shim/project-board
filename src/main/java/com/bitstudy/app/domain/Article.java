@@ -3,6 +3,7 @@ package com.bitstudy.app.domain;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.catalina.User;
 import org.hibernate.loader.collection.OneToManyJoinWalker;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -46,7 +47,7 @@ import java.util.Set;
 @Entity // 롬복을 이용해서 클래스를 엔티티로 변경 @Entity가 붙은 클래스는 JPA가 관리하게 된다.
         // 그래서 기본키(PK) 뭔지 알려줘야 하는 것.(@Id)
 @Getter // getter/setter toString 등의 롬복 어노테이션 사용시 자동으로 모든 필드의 메서드 생성됨
-@ToString
+@ToString(callSuper = true) //모든 필드의 toString생성. 상위(UserAccount)에 있는 toString까지 출력할수있도록
 @Table(indexes = { // @Table : 엔티티와 매핑할 정보를 지정
         //사용법) @Index(name="원하는명칭", columnList = "사용할 컬럼명)
         //name생략시 컬럼명 이름 그대로 사용
@@ -62,6 +63,10 @@ public class Article extends AuditingFields {
     @Id //전체 필드 중 PK가 무엇인지 선언. 없으면 @Entity 에러난다
     @GeneratedValue(strategy = GenerationType.IDENTITY) //해당 필드가 auto_increment인 경우 @Generatedvalue 써서 자동으로 값이 생성되게 해줘야 함. 기본키 전략
     private Long id;
+
+    @Setter
+    @ManyToOne(optional = false)
+    private UserAccount userAccount;
     @Setter @Column(nullable = false) private String title; // 제목
     @Setter @Column(nullable = false, length = 10000) private String content; // 본문
     @Setter private String hashtag; // 해시태그
@@ -71,7 +76,8 @@ public class Article extends AuditingFields {
     // 기본값은 true라서 안쓰면 null 가능. length = 바이트수(숫자) 안쓰면 기본값 255 적용
 
     /* 양방향 바인딩 */
-    @OrderBy("id") //양방향 바인딩의 정렬 기준을 id로 .
+//    @OrderBy("id") //양방향 바인딩의 정렬 기준을 id로 .
+    @OrderBy("registerDate desc ") //댓글리스트를 최근순으로 정렬되도록 바꿈
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     @ToString.Exclude /* ** 상단 @ToString 어노테이션 마우스오버시 @ToString includes ~ lazy load...
        퍼포먼스, 메모리 저하 유발할 수 있어 성능에 악영향가능성. 그래서 해당 필드를 가려달라는 요청*/
@@ -116,7 +122,8 @@ public class Article extends AuditingFields {
      * public 또는 protected만 가능. 어디에서도 기본생성자는 안쓰이게 하고싶어서 protected로 변경*/
     protected Article() { }
     /** 사용자가 입력하는 값만 받기. 나머지는 시스템이 알아서 작성하게 만듦.*/
-    private Article(String title, String content, String hashtag) {
+    private Article(UserAccount userAccount,String title, String content, String hashtag) {
+        this.userAccount = userAccount;
         this.title = title;
         this.content = content;
         this.hashtag = hashtag;
@@ -126,8 +133,8 @@ public class Article extends AuditingFields {
     * private : 해당 클래스 외에는 접근 불가
     * protected : 같은 패키지 및 상속 클래스에서 접근 가능
     * default : 같은 패키지에서 접근 가능 */
-    public static Article of(String title, String content, String hashtag){
-        return new Article(title, content, hashtag);
+    public static Article of(UserAccount userAccount, String title, String content, String hashtag){
+        return new Article(userAccount, title, content, hashtag);
     }
     /* 정적 팩토리 메서드 (factory method pattern 중 하나)
     * : 객체생성 역할을 하는 클래스 메서드라는 뜻

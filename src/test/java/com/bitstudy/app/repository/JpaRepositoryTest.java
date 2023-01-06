@@ -2,13 +2,13 @@ package com.bitstudy.app.repository;
 
 import com.bitstudy.app.config.JpaConfig;
 import com.bitstudy.app.domain.Article;
+import com.bitstudy.app.domain.UserAccount;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-import javax.swing.text.html.parser.Entity;
 import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,12 +26,15 @@ class JpaRepositoryTest {
     private final ArticleCommentRepository articleCommentRepository;
     /* 원래는 둘 다 @Autowired가 붙어야 하는데, JUnit5 버전과 최신버전의 스프링 부트를 이용하면
     * Test에서 생성자 주입패턴을 사용할 수 있다.*/
-
+    private final UserAccountRepository userAccountRepository;
     /* 생성자 만들기 - 여기서는 다른 파일에서 매개변수로 보내주는 것을 받는 거라서 위와 상관 없이
     * @Autowired를 붙여줘야 한다.*/
-    public JpaRepositoryTest(@Autowired ArticleRepository articleRepository, @Autowired ArticleCommentRepository articleCommentRepository){
+    public JpaRepositoryTest(@Autowired ArticleRepository articleRepository
+            , @Autowired ArticleCommentRepository articleCommentRepository
+            , @Autowired UserAccountRepository userAccountRepository){
         this.articleRepository = articleRepository;
         this.articleCommentRepository = articleCommentRepository;
+        this.userAccountRepository = userAccountRepository;
     }
 
     /* transaction시 사용하는 메서드
@@ -69,7 +72,8 @@ class JpaRepositoryTest {
     @Test
     void insertTest(){
         long count = articleRepository.count();
-        articleRepository.save(Article.of("테스트", "테스트1", "#테스트"));
+        UserAccount userAccount = userAccountRepository.save(UserAccount.of("bitstudy22", "1111", "bitstudy22@gmail.com","bit22","memo22"));
+        articleRepository.save(Article.of(userAccount,"테스트", "테스트1", "#테스트"));
         long count2 = articleRepository.count();
         assertThat(count2).isEqualTo(count + 1);
         /* Article 클래스 엔티티에서 Auditing 쓴다는 명시 (@EntityListeners(AuditingEntityListener.class))

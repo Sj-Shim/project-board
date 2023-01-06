@@ -5,49 +5,29 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/h_f.css">
+    <link rel="stylesheet" href="/css/search_bar.css">
     <title>게시판 페이지</title>
 </head>
 <body>
     <header id="header"></header>
 
-    <main id="article-main">
-        <h2>1번글</h2>
-        <aside>
-            <p>bitstudy</p>
-            <p><a href="mailto:lastfolio227@gmail.com">lastfolio227@gmail.com</a>lastfolio227@gmail.com</p>
-            <p>2023-01-04</p>
-            <p>#java</p>
-        </aside>
+    <main id="article-main" class="container">
+        <div class="row g-5">
+            <aside class="col-md-5 col-lg-4 order-md-last">
+                <p><span id="nickname">bitstudy</span></p>
+                <p><a href="mailto:bitstudy@gmail.com" id="email">bitstudy@gmail.com</a></p>
+                <p><time id="createdAt">2023-01-06</time></p>
+                <p><span id="hashtag">#java</span></p>
+            </aside>
 
-        <section>
-            <p>본문</p>
-            <br/><br/>
-            <div>
-
-                <form>
-                    <label>댓글</label>
-                    <textarea placeholder="댓글 입력"></textarea>
-                    <button type="submit">쓰기</button>
-                </form>
-
-                <ul>
-                    <li>
-                        <strong>goodjob</strong>
-                        <time><small>2023-01-04</small></time>
-                        <p>
-                            xyz
-                        </p>
-                    </li>
-                    <li>
-                        <strong>goodjob2</strong>
-                        <time><small>2023-01-05</small></time>
-                        <p>
-                            abc
-                        </p>
-                    </li>
-                </ul>
+            <div class="col-md-7 col-lg-8">
+                <p>내용</p>
             </div>
-        </section>
+
+        </div>
+
 
         <nav>
             <a href="#">이전</a>
@@ -56,5 +36,7 @@
     </main>
 
     <footer id="footer"></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
 </body>
 </html>
