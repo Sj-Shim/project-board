@@ -1,3 +1,10 @@
+a {
+    text-decoration: none;
+    color: inherit;
+}
+tr:hover:not(thead>tr) {
+    background: #e1f5f7;
+}
 .bd-placeholder-img {
     font-size: 1.125rem;
     text-anchor: middle;
