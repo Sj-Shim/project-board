@@ -1,14 +1,27 @@
 package com.bitstudy.app.controller;
 
 import com.bitstudy.app.config.SecurityConfig;
+import com.bitstudy.app.dto.ArticleCommentDto;
+import com.bitstudy.app.dto.ArticleWithCommentsDto;
+import com.bitstudy.app.dto.UserAccountDto;
+import com.bitstudy.app.service.ArticleService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
+import java.util.Set;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -25,6 +38,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("view 컨트롤러 - 게시글")
 class ArticleControllerTest {
     private final MockMvc mvc;
+    @MockBean private ArticleService articleService;
+    /*@MockBean : 테스트시 테스트에 필요한 객체를 bean으로 등록시켜서 기존 객체대신 사용할 수 있게 만들어 줌
+    * ArticleController에 있는 private final ArticleService articleService; 부분의
+    * articleService를 배제하기 위해서 @MockBean 사용 : MockMvc가 입출력 관련된 것들만 보게 하기 위해서
+    * 실제 서비스 로직을 끊어주기 위함*/
 
     public ArticleControllerTest(@Autowired MockMvc mvc) {
         this.mvc = mvc;
@@ -33,6 +51,9 @@ class ArticleControllerTest {
     @DisplayName("게시판 리스트 페이지")
     @Test
     void articlesPage() throws Exception{
+        given(articleService.searchArticles(eq(null), eq(null), any(Pageable.class))).willReturn(Page.empty());
+
+
         mvc.perform(get("/articles"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
@@ -44,17 +65,22 @@ class ArticleControllerTest {
                 .andExpect(model().attributeExists("articles"));
                 //가져온 뷰에서 게시글들이 떠야하는데 그 말은 서버에서 데이터들을 가져왔다는 뜻이므로 모델 attribute에
                 // articles가 있어야 할 것이다. 이 여부를 확인하는 테스트. 맵에 articles라는 키가 있는지 검사
+        then(articleService).should().searchArticles(eq(null), eq(null), any(Pageable.class));
     }
 
     @DisplayName("게시글 상세 페이지")
     @Test
     void articlePage() throws Exception {
+        Long articleId = 1L;
+        given(articleService.getArticle(articleId)).willReturn(createArticleWithCommentsDto());
         mvc.perform(get("/articles/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/detail"))
                 .andExpect(model().attributeExists("article"))
                 .andExpect(model().attributeExists("articleComments"));
+
+        then(articleService).should().getArticle(articleId);
     }
 
     @DisplayName("게시글 검색 전용 페이지 - 정상호출")
@@ -73,5 +99,36 @@ class ArticleControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/search-hashtag"));
+    }
+
+    private ArticleWithCommentsDto createArticleWithCommentsDto() {
+        return ArticleWithCommentsDto.of(
+                1L,
+                createUserAccountDto(),
+//                Set<ArticleCommentDto> articleCommentDtos,
+                Set.of(),
+                "title",
+                "content",
+                "#java",
+                LocalDateTime.now(),
+                "bitstudy",
+                LocalDateTime.now(),
+                "bitstudy"
+        );
+    }
+
+    private UserAccountDto createUserAccountDto() {
+        return UserAccountDto.of(
+                1L,
+                "bitstudy",
+                "password",
+                "bitstudy@email.com",
+                "bitstudy",
+                "memo",
+                LocalDateTime.now(),
+                "bitstudy",
+                LocalDateTime.now(),
+                "bitstudy"
+        );
     }
 }
