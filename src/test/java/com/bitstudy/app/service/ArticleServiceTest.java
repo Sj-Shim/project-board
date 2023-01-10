@@ -1,12 +1,30 @@
 package com.bitstudy.app.service;
 
+import com.bitstudy.app.domain.Article;
+import com.bitstudy.app.domain.UserAccount;
+import com.bitstudy.app.domain.type.SearchType;
+import com.bitstudy.app.dto.ArticleCommentDto;
+import com.bitstudy.app.dto.ArticleDto;
+import com.bitstudy.app.dto.ArticleWithCommentsDto;
+import com.bitstudy.app.dto.UserAccountDto;
 import com.bitstudy.app.repository.ArticleRepository;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
+
 /** 서비스 비즈니스 로직 테스트
  * (슬라이스 테스트 기능 없이)
  * 스프링 부트 어플리케이션 컨텍스트가 뜨는 데 걸리는 시간을 없애기 위함
@@ -20,4 +38,153 @@ class ArticleServiceTest {
 
     @Mock
     private ArticleRepository articleRepository;
+
+    /** 테스트 할 기능
+     * 1. 검색
+     * 2. 각 게시글 선택 시 해당 게시글 상세 페이지 이동
+     * 3. 페이지네이션*/
+
+    /* 검색 */
+    @Test
+    @DisplayName("검색 테스트 - case1) 검색어 없이 검색버튼>게시글리스트 반환")
+    public void givenBlankKeyword_whenGetSearch_thenReturnArticlesList () {
+        //Given : 페이지 기능
+        Pageable pageable = Pageable.ofSize(20); //한 페이지당 얼마나 가져올건지
+        given(articleRepository.findAll(pageable)).willReturn(Page.empty());
+        //When : 케이스. 입력이 없을 때(실제 테스트 내용)
+        Page<ArticleDto> articles = sut.searchArticles(null, null, pageable);
+        //Then
+        assertThat(articles).isEmpty();
+        then(articleRepository).should().findAll(pageable);
+    }
+
+    @Test
+    @DisplayName("검색 테스트 - case2) 검색어 넣고 검색> 검색결과 반환")
+    public void givenKeyword_whenGetSearch_thenReturnArticlesList() {
+        //Given
+        SearchType searchType = SearchType.TITLE;
+        String searchKeyword = "title";
+        Pageable pageable = Pageable.ofSize(20);
+        given(articleRepository.findByTitleContaining(searchKeyword, pageable)).willReturn(Page.empty());
+        //When
+        Page<ArticleDto> articles = sut.searchArticles(searchType, searchKeyword, pageable);
+        //Then
+        assertThat(articles).isEmpty();
+        then(articleRepository).should().findByTitleContaining(searchKeyword, pageable);
+    }
+
+    /* 게시글 선택*/
+    @Test
+    @DisplayName("게시글 선택 - 게시글 반환")
+    public void givenArticle_whenSelectArticle_thenReturnArticleOne() {
+        //Given
+        Article article = createArticle();
+        Long articleId = 1L;
+        given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
+
+        //When
+        ArticleWithCommentsDto dto = sut.getArticle(articleId);
+
+        //Then
+        assertThat(dto)
+                .hasFieldOrPropertyWithValue("title", article.getTitle())
+                .hasFieldOrPropertyWithValue("content", article.getContent())
+                .hasFieldOrPropertyWithValue("hashtag", article.getHashtag());
+        then(articleRepository).should().findById(articleId);
+    }
+
+    /* 게시글 생성 */
+    @DisplayName("게시글 정보 입력, 게시글 생성")
+    @Test
+    public void givenArticleInfo_whenCreateArticle() {
+        //Given
+        ArticleDto dto = createArticleDto();
+        given(articleRepository.save(any(Article.class))).willReturn(createArticle());
+        //When
+        sut.saveArticle(dto);
+        //Then
+        then(articleRepository).should().save(any(Article.class));
+    }
+
+    /* 게시글 수정 */
+    @DisplayName("게시글 정보 입력, 게시글 수정")
+    @Test
+    public void givenArticleInfo_whenUpdateArticle() {
+        //Given
+        ArticleDto dto = createArticleDto("title", "content", "#java");
+        Article article = createArticle();
+        given(articleRepository.getReferenceById(dto.id())).willThrow(EntityNotFoundException.class);
+        // record는 별도의 getter를 만들지 않아도 됨. 일반 필드처럼 가져다 쓰면 됨.
+        //When
+        sut.updateArticle(dto);
+        //Then
+        assertThat(article)
+                .hasFieldOrPropertyWithValue("title", dto.title())
+                .hasFieldOrPropertyWithValue("content", dto.content())
+                .hasFieldOrPropertyWithValue("hashtag", dto.hashtag());
+        then(articleRepository).should().getReferenceById(dto.id());
+    }
+
+    /* 게시글 삭제 */
+    @DisplayName("게시글 아이디 입력, 게시글 삭제")
+    @Test
+    public void givenArticleId_whenDeleteArticle() {
+        //Given
+        Long articleId = 1L;
+        willDoNothing().given(articleRepository).deleteById(articleId);
+        //When
+        sut.deleteArticle(articleId);
+        //Then
+        then(articleRepository).should().deleteById(articleId);
+    }
+    private UserAccount createUserAccount() {
+        return UserAccount.of(
+                "bitstudy",
+                "password",
+                "bitgg@email.com",
+                "bitgg",
+                "null"
+        );
+    }
+
+    private Article createArticle() {
+        return Article.of(
+                createUserAccount(),
+                "title",
+                "content",
+                "#java"
+        );
+    }
+
+    private ArticleDto createArticleDto() {
+        return createArticleDto("title", "content", "java");
+    }
+    private ArticleDto createArticleDto(String title, String content, String hashtag){
+        return ArticleDto.of(
+                1L,
+                createUserAccountDto(),
+                title,
+                content,
+                hashtag,
+                LocalDateTime.now(),
+                "bitgg",
+                LocalDateTime.now(),
+                "bitgg"
+        );
+    }
+
+    private UserAccountDto createUserAccountDto() {
+        return UserAccountDto.of(
+                1L,
+                "bitstudy",
+                "password",
+                "bitgg@email.com",
+                "bitgg",
+                "memos",
+                LocalDateTime.now(),
+                "bitgg",
+                LocalDateTime.now(),
+                "bitgg"
+        );
+    }
 }

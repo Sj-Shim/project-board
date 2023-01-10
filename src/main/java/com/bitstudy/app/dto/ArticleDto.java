@@ -3,6 +3,7 @@ package com.bitstudy.app.dto;
 import com.bitstudy.app.domain.Article;
 
 import java.time.LocalDateTime;
+import java.io.Serializable;
 
 /** record : 자바 16부터 추가된 속성. DTO와 비슷.
  *  DTO를 구현하려면 게터,세터,이퀄즈, 해시코드, 투스트링같은 데이터처리를 수행하기 위해 오버라이드된 메서드를

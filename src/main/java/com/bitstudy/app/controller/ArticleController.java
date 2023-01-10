@@ -1,12 +1,21 @@
 package com.bitstudy.app.controller;
 
 import com.bitstudy.app.domain.Article;
+import com.bitstudy.app.domain.type.SearchType;
+import com.bitstudy.app.dto.response.ArticleResponse;
+import com.bitstudy.app.dto.response.ArticleWithCommentsResponse;
+import com.bitstudy.app.service.ArticleService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -22,21 +31,41 @@ import java.util.List;
  *  static 디렉터리에는 css,js, img등 정적 파일 작성.
  *
  * */
+@RequiredArgsConstructor //필수 필드에 대한 생성자 자동 생성
+//@RequiredArgsConstructor는 초기화되지 않은 final필드 또는 @NonNull이 붙은 필드에 대해 생성자를 생성해주는 롬복 어노테이션
 @Controller
 @RequestMapping("/articles") //모든 경로들이 /articles로 시작하므로 클래스 레벨에 걸어줌
 public class ArticleController {
+    private final ArticleService articleService;
     @GetMapping
-    public String articles(ModelMap map) {
+    public String articles(
+            @RequestParam(required = false) SearchType searchType,
+            @RequestParam(required = false) String searchValue,
+            //@RequestParam : 검색어 받기 위한 어노테이션. getParameter 불러옴. 필수는 아니다.
+            //Test로 null 쓰려면 null 허용해주기 위한 (required = false) 필요(없으면 게시글 전체조회됨)
+            @PageableDefault(size = 10, sort = "registerDate", direction = Sort.Direction.DESC) Pageable pageable, //@PageableDefault : 페이징 기본 설정
+            ModelMap map) {
         /* ModelMap : 테스트파일에서 attribute 체크도 넣어놔서 필요함.
         * Model , ModelMap 차이 : Model은 인터페이스 ModelMap은 클래스(구현체). 사용법은 같음*/
-        map.addAttribute("articles", List.of()); //키 : articles, 값: 그냥 list
+//        map.addAttribute("articles", List.of()); //키 : articles, 값: 그냥 list
+        map.addAttribute("articles", articleService.searchArticles(searchType, searchValue, pageable).map(ArticleResponse::from));
+        /*실제로 정보를 넣어주기 위해 ArticleService.java의 메서드에 값을 넣어 줌.
+          searchArticle()의 반환타입은 dto인데 dto는 모든 엔티티의 데이터를 다 다루고 있어서
+          그걸 한번 더 가공해서 필요한 것들만 쓸 것임. 그래서 게시글 내용만 가진
+          ArticleResponse를 사용.
+        */
         return "articles/index";
     }
 
     @GetMapping("/{articleId}")
     public String articleOne(@PathVariable Long articleId, ModelMap map){
-        map.addAttribute("article", null);//테스트할때는 null말고 뭔가 넣어줘야함
-        map.addAttribute("articleComments", List.of());
+        ArticleWithCommentsResponse article = ArticleWithCommentsResponse.from(articleService.getArticle(articleId));
+
+//        map.addAttribute("article", null);//테스트할때는 null말고 뭔가 넣어줘야함
+//        map.addAttribute("articleComments", List.of());
+        map.addAttribute("article", article);
+        map.addAttribute("articleComments", article.articleCommentsResponse());
+        //
         return "articles/detail";
     }
 }

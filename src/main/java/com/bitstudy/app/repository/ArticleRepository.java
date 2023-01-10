@@ -3,6 +3,8 @@ package com.bitstudy.app.repository;
 import com.bitstudy.app.domain.Article;
 import com.bitstudy.app.domain.QArticle;
 import com.querydsl.core.types.dsl.StringExpression;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
@@ -27,6 +29,11 @@ public interface ArticleRepository  extends
     *       순서 : 1. 바인딩
     *              2. 검색용 필드를 추가*/
 
+    Page<Article> findByTitleContaining(String title, Pageable pageable);
+    Page<Article> findByContentContaining(String title, Pageable pageable);
+    Page<Article> findByUserAccount_UserIdContaining(String title, Pageable pageable);
+    Page<Article> findByUserAccount_NicknameContaining(String title, Pageable pageable);
+    Page<Article> findByHashtagContaining(String title, Pageable pageable);
 
     @Override
     default void customize(QuerydslBindings bindings, QArticle root) {

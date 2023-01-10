@@ -2,4 +2,16 @@
 <thlogic xmlns:th="http://www.thymeleaf.org">
     <attr sel="#header" th:replace="header :: #header" />
     <attr sel="#footer" th:replace="footer :: #footer" />
+
+    <attr sel="#article-table">
+        <attr sel="tbody" th:remove="all-but-first">
+            <!-- tbody안의 tr들을 첫번째요소 빼고 다 지우기. 하나만 남기는 이유는 기본 포멧이 필요해서-->
+            <attr sel="tr[0]" th:each="article:${articles}">
+                <attr sel="td.title/a" th:text="${article.title}" th:href="@{'/articles/'+${article.id}}" />
+                <attr sel="td.hashtag/a" th:text="${article.hashtag}" th:href="@{'/articles/'+${article.id}}"/>
+                <attr sel="td.user-id" th:text="${article.nickname}" />
+                <attr sel="td.register-date" th:datetime="${#temporals.format(article.registerDate, 'yyyy-MM-dd HH:mm')}"/>
+            </attr>
+        </attr>
+    </attr>
 </thlogic>
