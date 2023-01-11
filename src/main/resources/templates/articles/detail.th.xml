@@ -17,13 +17,17 @@
             <attr sel=".media-body/p" th:text="${comment.content}"/>
         </attr>
         <attr sel="#nickname" th:text="${article.nickname}"/>
-        <attr sel="#email" th:text="${article.email}" th:href="${article.email}" />
+        <attr sel="#email" th:text="${article.email}" th:href="@{mailto:${article.email}}" />
         <attr sel="#createdAt" th:text="${#temporals.format(article.registerDate, 'yyyy-MM-dd HH:mm:ss')}"/>
         <attr sel="#hashtag" th:text="${article.hashtag}"/>
+
+        <!--페이징-->
+        <attr sel="nav.blog-pagination">
+            <attr sel="a.btn-outline-primary" th:href="@{*{id} - 1 <= 0 ? '#' : |/articles/*{id-1}|}" th:class="'btn btn-outline-primary rounded-pill' + (*{id} - 1 <= 0 ? ' disabled' : '')" />
+            <attr sel="a.btn-outline-secondary" th:href="@{*{id} >= ${totalCount} ? '#' : |/articles/*{id+1}}" th:class="'btn btn-outline-secondary rounded-pill' + (*{id} >= ${totalCount} ? ' disabled' : '')"/>
+        </attr>
+
     </attr>
-
-
-
 
 
 </thlogic>
