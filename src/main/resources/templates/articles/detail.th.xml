@@ -2,4 +2,28 @@
 <thlogic xmlns:th="http://www.thymeleaf.org">
     <attr sel="#header" th:replace="header :: #header" />
     <attr sel="#footer" th:replace="footer :: #footer" />
+
+    <attr sel="#article-main" th:object="${article}">
+        <attr sel=".blog-post/h2" th:text="${article.title}"/>
+        <attr sel="p.blog-post-meta/span" th:text="${#temporals.format(article.registerDate, 'yyyy-MM-dd HH:mm')} + ' by '"/>
+        <attr sel="p.blog-post-meta/a" th:text="${article.nickname}"/>
+        <attr sel="p.blog-post-content" th:text="${article.content}"/>
+
+        <attr sel="ul.media-list" th:remove="all-but-first">
+            <attr sel="li.media" th:each="comment:${articleComments}">
+                <attr sel="time.text-muted" th:text="${#temporals.format(comment.registerDate, 'yyyy-MM-dd HH:mm:ss')}"/>
+                <attr sel="strong.text-success" th:text="${comment.nickname}"/>
+            </attr>
+            <attr sel=".media-body/p" th:text="${comment.content}"/>
+        </attr>
+        <attr sel="#nickname" th:text="${article.nickname}"/>
+        <attr sel="#email" th:text="${article.email}" th:href="${article.email}" />
+        <attr sel="#createdAt" th:text="${#temporals.format(article.registerDate, 'yyyy-MM-dd HH:mm:ss')}"/>
+        <attr sel="#hashtag" th:text="${article.hashtag}"/>
+    </attr>
+
+
+
+
+
 </thlogic>
