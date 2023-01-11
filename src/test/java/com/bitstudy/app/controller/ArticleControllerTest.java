@@ -5,6 +5,7 @@ import com.bitstudy.app.dto.ArticleCommentDto;
 import com.bitstudy.app.dto.ArticleWithCommentsDto;
 import com.bitstudy.app.dto.UserAccountDto;
 import com.bitstudy.app.service.ArticleService;
+import com.bitstudy.app.service.PaginationService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
@@ -18,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -39,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ArticleControllerTest {
     private final MockMvc mvc;
     @MockBean private ArticleService articleService;
+    @MockBean private PaginationService paginationService;
     /*@MockBean : 테스트시 테스트에 필요한 객체를 bean으로 등록시켜서 기존 객체대신 사용할 수 있게 만들어 줌
     * ArticleController에 있는 private final ArticleService articleService; 부분의
     * articleService를 배제하기 위해서 @MockBean 사용 : MockMvc가 입출력 관련된 것들만 보게 하기 위해서
@@ -52,7 +55,7 @@ class ArticleControllerTest {
     @Test
     void articlesPage() throws Exception{
         given(articleService.searchArticles(eq(null), eq(null), any(Pageable.class))).willReturn(Page.empty());
-
+        given(paginationService.getPaginationBarNumbers(anyInt(), anyInt())).willReturn(List.of(0,1,2,3,4));
 
         mvc.perform(get("/articles"))
                 .andExpect(status().isOk())
@@ -62,10 +65,12 @@ class ArticleControllerTest {
     //contentTypeCompatibleWith : 호환되는 타입까지 허용해줌
                 .andExpect(view().name("articles/index"))
                 //가져온 뷰 파일 이름 체크 (articles폴더 안의 index 인지 확인중)
-                .andExpect(model().attributeExists("articles"));
+                .andExpect(model().attributeExists("articles"))
+                .andExpect(model().attributeExists("paginationBarNumbers"));
                 //가져온 뷰에서 게시글들이 떠야하는데 그 말은 서버에서 데이터들을 가져왔다는 뜻이므로 모델 attribute에
                 // articles가 있어야 할 것이다. 이 여부를 확인하는 테스트. 맵에 articles라는 키가 있는지 검사
         then(articleService).should().searchArticles(eq(null), eq(null), any(Pageable.class));
+        then(paginationService).should().getPaginationBarNumbers(anyInt(),anyInt());
     }
 
     @DisplayName("게시글 상세 페이지")

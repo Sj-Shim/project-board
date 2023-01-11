@@ -5,6 +5,9 @@ a {
 tr:hover:not(thead>tr) {
     background: #e1f5f7;
 }
+tr:hover a {
+    text-decoration: underline;
+}
 .bd-placeholder-img {
     font-size: 1.125rem;
     text-anchor: middle;

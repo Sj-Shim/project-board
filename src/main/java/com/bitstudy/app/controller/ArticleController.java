@@ -5,7 +5,9 @@ import com.bitstudy.app.domain.type.SearchType;
 import com.bitstudy.app.dto.response.ArticleResponse;
 import com.bitstudy.app.dto.response.ArticleWithCommentsResponse;
 import com.bitstudy.app.service.ArticleService;
+import com.bitstudy.app.service.PaginationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -37,6 +39,7 @@ import java.util.List;
 @RequestMapping("/articles") //모든 경로들이 /articles로 시작하므로 클래스 레벨에 걸어줌
 public class ArticleController {
     private final ArticleService articleService;
+    private final PaginationService paginationService;
     @GetMapping
     public String articles(
             @RequestParam(required = false) SearchType searchType,
@@ -48,12 +51,18 @@ public class ArticleController {
         /* ModelMap : 테스트파일에서 attribute 체크도 넣어놔서 필요함.
         * Model , ModelMap 차이 : Model은 인터페이스 ModelMap은 클래스(구현체). 사용법은 같음*/
 //        map.addAttribute("articles", List.of()); //키 : articles, 값: 그냥 list
-        map.addAttribute("articles", articleService.searchArticles(searchType, searchValue, pageable).map(ArticleResponse::from));
+//        map.addAttribute("articles", articleService.searchArticles(searchType, searchValue, pageable).map(ArticleResponse::from));
         /*실제로 정보를 넣어주기 위해 ArticleService.java의 메서드에 값을 넣어 줌.
           searchArticle()의 반환타입은 dto인데 dto는 모든 엔티티의 데이터를 다 다루고 있어서
           그걸 한번 더 가공해서 필요한 것들만 쓸 것임. 그래서 게시글 내용만 가진
           ArticleResponse를 사용.
         */
+        Page<ArticleResponse> articles = articleService.searchArticles(searchType, searchValue, pageable).map(ArticleResponse::from);
+        List<Integer> barNumbers = paginationService.getPaginationBarNumbers(pageable.getPageNumber(), articles.getTotalPages());
+
+        map.addAttribute("articles", articles);
+        map.addAttribute("paginationBarNumbers", barNumbers);
+
         return "articles/index";
     }
 
