@@ -39,6 +39,7 @@ class ArticleServiceTest {
     @Mock
     private ArticleRepository articleRepository;
 
+
     /** 테스트 할 기능
      * 1. 검색
      * 2. 각 게시글 선택 시 해당 게시글 상세 페이지 이동
@@ -92,7 +93,18 @@ class ArticleServiceTest {
                 .hasFieldOrPropertyWithValue("hashtag", article.getHashtag());
         then(articleRepository).should().findById(articleId);
     }
-
+    @DisplayName("게시글 수 조회, 게시글 수 반환")
+    @Test
+    public void givenNothing_thenReturnArticleCount() {
+        //Given
+        long expected = 0l;
+        given(articleRepository.count()).willReturn(expected);
+        //When
+        long actual = sut.getArticleCount();
+        //Then
+        assertThat(actual).isEqualTo(expected);
+        then(articleRepository).should().count();
+    }
     /* 게시글 생성 */
     @DisplayName("게시글 정보 입력, 게시글 생성")
     @Test

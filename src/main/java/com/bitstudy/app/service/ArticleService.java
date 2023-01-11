@@ -86,8 +86,13 @@ public class ArticleService {
             log.warn("게시글 업데이트 실패. 게시글을 찾을 수 없습니다.");
         }
     }
-
+    /** 게시글 삭제 */
     public void deleteArticle(Long articleId){
         articleRepository.deleteById(articleId);
+    }
+
+    /** 게시글 개수 구하기 - 마지막 글일 경우 '다음' 버튼 비활성화 시키기 위함*/
+    public long getArticleCount() {
+        return articleRepository.count();
     }
 }
