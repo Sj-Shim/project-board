@@ -62,6 +62,8 @@ public class ArticleController {
 
         map.addAttribute("articles", articles);
         map.addAttribute("paginationBarNumbers", barNumbers);
+        map.addAttribute("searchTypes", searchType.values());
+        /*enum .values() : enum인 요소들을 배열로 넘겨준다.*/
 
         return "articles/index";
     }
