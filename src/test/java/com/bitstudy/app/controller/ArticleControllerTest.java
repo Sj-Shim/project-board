@@ -1,6 +1,7 @@
 package com.bitstudy.app.controller;
 
 import com.bitstudy.app.config.SecurityConfig;
+import com.bitstudy.app.domain.type.SearchType;
 import com.bitstudy.app.dto.ArticleCommentDto;
 import com.bitstudy.app.dto.ArticleWithCommentsDto;
 import com.bitstudy.app.dto.UserAccountDto;
@@ -71,6 +72,33 @@ class ArticleControllerTest {
                 // articles가 있어야 할 것이다. 이 여부를 확인하는 테스트. 맵에 articles라는 키가 있는지 검사
         then(articleService).should().searchArticles(eq(null), eq(null), any(Pageable.class));
         then(paginationService).should().getPaginationBarNumbers(anyInt(),anyInt());
+    }
+
+    @Test
+    @DisplayName("게시판 리스트 페이지 - 검색어와 함께 호출")
+    public void givenSearchKeyword_thenReturnArticles() throws Exception{
+        //Given
+        SearchType searchType = SearchType.TITLE;
+        String searchValue = "title";
+        given(articleService.searchArticles(eq(searchType), eq(searchValue), any(Pageable.class))).willReturn(Page.empty());
+        given(paginationService.getPaginationBarNumbers(anyInt(),anyInt())).willReturn(List.of(0,1,2,3,4)); /* 검색했을 때 페이징기능을 호출하긴 하는지 확인*/
+
+        //When
+        mvc.perform(
+                get("/articles")
+                .queryParam("searchType", searchType.name())
+                .queryParam("searchValue", searchValue)
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(view().name("articles/index"))
+                .andExpect(model().attributeExists("articles"))
+                .andExpect(model().attributeExists("searchTypes"));
+
+        //Then
+        then(articleService).should().searchArticles(eq(searchType), eq(searchValue), any(Pageable.class));
+        then(paginationService).should().getPaginationBarNumbers(anyInt(),anyInt());
+
     }
 
     @DisplayName("게시글 상세 페이지")
