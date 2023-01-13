@@ -1,6 +1,7 @@
 package com.bitstudy.app.dto;
 
 import com.bitstudy.app.domain.Article;
+import com.bitstudy.app.domain.UserAccount;
 
 import java.time.LocalDateTime;
 import java.io.Serializable;
@@ -27,8 +28,11 @@ public record ArticleDto( //우선 엔티티가 가진 모든 정보를 dto도 �
         LocalDateTime modifiedDate,
         String modifiedBy) {
 
-    public static ArticleDto of(Long id, UserAccountDto userAccountDto, String title, String content, String hashtag, LocalDateTime registerDate, String createdBy, LocalDateTime modifiedDate, String modifiedBy) {
-        return new ArticleDto(id, userAccountDto, title, content, hashtag, registerDate, createdBy,modifiedDate, modifiedBy);
+    public static ArticleDto of(UserAccountDto userAccountDto, String title, String content, String hashtag, LocalDateTime registerDate, String createdBy, LocalDateTime modifiedDate, String modifiedBy) {
+        return new ArticleDto(null, userAccountDto, title, content, hashtag, registerDate, createdBy,modifiedDate, modifiedBy);
+    }
+    public static ArticleDto of(UserAccountDto userAccountDto, String title, String content, String hashtag) {
+        return new ArticleDto(null, userAccountDto, title, content, hashtag, null, null, null, null);
     }
     /* entity를 매개변수로 입력하면 ArticleDto로 반환해주는 메서드.
     * entity를 받아서 new 한 뒤 인스턴스에다가 entity. 하면서 매핑시켜서 return하는 것. 맵퍼라고 부름.*/
@@ -36,7 +40,7 @@ public record ArticleDto( //우선 엔티티가 가진 모든 정보를 dto도 �
         return new ArticleDto(entity.getId(), UserAccountDto.from(entity.getUserAccount()), entity.getTitle(), entity.getContent(), entity.getHashtag(), entity.getRegisterDate(), entity.getCreatedBy(), entity.getModifiedDate(), entity.getModifiedBy());
     }
 
-    public Article toEntity() {
-        return Article.of(this.userAccountDto.toEntity(), this.title, this.content, this.hashtag);
+    public Article toEntity(UserAccount userAccount) {
+        return Article.of(userAccount, this.title, this.content, this.hashtag);
     }
 }

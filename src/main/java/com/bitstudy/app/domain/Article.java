@@ -66,6 +66,8 @@ public class Article extends AuditingFields {
 
     @Setter
     @ManyToOne(optional = false)
+    @JoinColumn(name = "userId")
+    /*@JoinColumn은 외래키FK를 맵핑할 때 사용*/
     private UserAccount userAccount;
     @Setter @Column(nullable = false) private String title; // 제목
     @Setter @Column(nullable = false, length = 10000) private String content; // 본문

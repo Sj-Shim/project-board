@@ -20,13 +20,14 @@ public class ArticleCommentService {
     private final ArticleRepository articleRepository;
     private final ArticleCommentRepository articleCommentRepository;
 
+    /** 댓글 리스트 조회*/
     @Transactional(readOnly = true)
     public List<ArticleCommentDto> searchArticleComment(Long articleId) {
         return articleCommentRepository.findByArticle_Id(articleId)
                 .stream().map(ArticleCommentDto::from)
                 .toList();
     }
-
+    /** 댓글 저장*/
     public void saveArticleComment(ArticleCommentDto dto) {
         try{
             articleCommentRepository.save(dto.toEntity(articleRepository.getReferenceById(dto.articleId())));
@@ -34,7 +35,7 @@ public class ArticleCommentService {
             log.warn("댓글 저장 실패");
         }
     }
-
+    /** 댓글 수정 */
     public void updateArticleComment(ArticleCommentDto dto) {
         try{
             ArticleComment articleComment = articleCommentRepository.getReferenceById(dto.id());
@@ -45,8 +46,8 @@ public class ArticleCommentService {
             log.warn("댓글 수정 실패");
         }
     }
-
-    public void deleteArticleComment(Long id) {
-        articleCommentRepository.deleteById(id);
+    /** 댓글 삭제*/
+    public void deleteArticleComment(Long articleCommentId) {
+        articleCommentRepository.deleteById(articleCommentId);
     }
 }
