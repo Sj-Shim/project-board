@@ -29,12 +29,14 @@ public interface ArticleRepository  extends
     *       순서 : 1. 바인딩
     *              2. 검색용 필드를 추가*/
 
-    Page<Article> findByTitleContaining(String title, Pageable pageable);
-    Page<Article> findByContentContaining(String title, Pageable pageable);
+    Page<Article> findByTitleContainingIgnoreCase(String title, Pageable pageable);
+
+    Page<Article> findByContentContainingIgnoreCase(String title, Pageable pageable);
     Page<Article> findByUserAccount_UserIdContaining(String title, Pageable pageable);
     Page<Article> findByUserAccount_NicknameContaining(String title, Pageable pageable);
     Page<Article> findByHashtagContaining(String title, Pageable pageable);
 
+    void deleteByIdAndUserAccount_UserId(Long articleId, String userId);
     @Override
     default void customize(QuerydslBindings bindings, QArticle root) {
         /* 1. 바인딩

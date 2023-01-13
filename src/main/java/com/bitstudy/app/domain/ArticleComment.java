@@ -14,7 +14,7 @@ import java.util.Objects;
 
 @Entity
 @Getter
-@ToString
+@ToString(callSuper = true)
 @Table(indexes = {
     @Index(columnList = "content"),
     @Index(columnList = "registerDate"),
@@ -37,6 +37,7 @@ public class ArticleComment extends AuditingFields{
      * */
     @Setter
     @ManyToOne(optional = false)
+    @JoinColumn(name = "userId")
     private UserAccount userAccount;
 
     @Setter

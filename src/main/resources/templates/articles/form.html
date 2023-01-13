@@ -1,0 +1,73 @@
+
+<!-- 할일: 글쓰기 페이지 만들기
+            이거 다 만들고 form.th.xml 파일 가서 데이터 밀어넣기 하기
+-->
+
+
+
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="자바스프링 게시판">
+    <meta name="author" content="bitstudy">
+
+    <title>Bootstrap demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+
+
+</head>
+<body>
+
+
+<header id="header">
+    헤더 삽입부
+    <hr>
+</header>
+
+<main class="container">
+    <header id="article-form-header" class="py-5 text-center">
+        <h1>게시글 작성</h1>
+    </header>
+
+    <form id="article-form">
+        <div class="row mb-3 justify-content-md-center">
+            <label for="title" class="col-sm-2 col-lg-1 col-form-label text-sm-end">제목</label>
+            <div class="col-sm-8 col-lg-9">
+                <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+        </div>
+        <div class="row mb-3 justify-content-md-center">
+            <label for="content" class="col-sm-2 col-lg-1 col-form-label text-sm-end">본문</label>
+            <div class="col-sm-8 col-lg-9">
+                <textarea class="form-control" id="content" name="content" rows="5" required style="resize: none"></textarea>
+            </div>
+        </div>
+        <div class="row mb-4 justify-content-md-center">
+            <label for="hashtag" class="col-sm-2 col-lg-1 col-form-label text-sm-end">해시태그</label>
+            <div class="col-sm-8 col-lg-9">
+                <input type="text" class="form-control" id="hashtag" name="hashtag">
+            </div>
+        </div>
+        <div class="row mb-5 justify-content-md-center">
+            <div class="col-sm-10 d-grid gap-2 d-sm-flex justify-content-sm-end">
+                <button type="submit" class="btn btn-primary" id="submit-button">저장</button>
+                <button type="button" class="btn btn-secondary" id="cancel-button">취소</button>
+            </div>
+        </div>
+    </form>
+</main>
+
+<!-- 헤더처럼 안에 내용만 채우기-->
+<footer id="footer">
+    <hr>
+    푸터 삽입부
+</footer>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+</body>
+</html>

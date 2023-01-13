@@ -5,7 +5,7 @@ import com.bitstudy.app.domain.UserAccount;
 import java.time.LocalDateTime;
 
 public record UserAccountDto(
-        Long id,
+//        Long id,
         String userId,
         String userPassword,
         String email,
@@ -16,7 +16,7 @@ public record UserAccountDto(
         LocalDateTime modifiedDate,
         String modifiedBy
 ) {
-    public static UserAccountDto of(Long id,
+    public static UserAccountDto of(
                                     String userId,
                                     String userPassword,
                                     String email,
@@ -26,11 +26,29 @@ public record UserAccountDto(
                                     String createdBy,
                                     LocalDateTime modifiedDate,
                                     String modifiedBy) {
-        return new UserAccountDto(id, userId, userPassword, email, nickname, memo, registerDate, createdBy, modifiedDate, modifiedBy);
+        return new UserAccountDto(userId, userPassword, email, nickname, memo, registerDate, createdBy, modifiedDate, modifiedBy);
     }
-
+    public static UserAccountDto of(
+                                    String userId,
+                                    String userPassword,
+                                    String email,
+                                    String nickname,
+                                    String memo) {
+        return new UserAccountDto(userId, userPassword, email, nickname, memo, null, null, null, null);
+    }
     public static UserAccountDto from(UserAccount entity){
-        return new UserAccountDto(entity.getId(),entity.getUserId(), entity.getUserPassword(), entity.getEmail(), entity.getNickname(), entity.getMemo(), entity.getRegisterDate(), entity.getCreatedBy(), entity.getModifiedDate(), entity.getModifiedBy());
+        return new UserAccountDto(
+//                entity.getId(),
+                entity.getUserId()
+                , entity.getUserPassword()
+                , entity.getEmail()
+                , entity.getNickname()
+                , entity.getMemo()
+                , entity.getRegisterDate()
+                , entity.getCreatedBy()
+                , entity.getModifiedDate()
+                , entity.getModifiedBy()
+        );
     }
 
     public UserAccount toEntity() {

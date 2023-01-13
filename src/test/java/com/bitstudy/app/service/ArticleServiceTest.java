@@ -8,6 +8,8 @@ import com.bitstudy.app.dto.ArticleDto;
 import com.bitstudy.app.dto.ArticleWithCommentsDto;
 import com.bitstudy.app.dto.UserAccountDto;
 import com.bitstudy.app.repository.ArticleRepository;
+import com.bitstudy.app.repository.UserAccountRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,6 +40,8 @@ class ArticleServiceTest {
 
     @Mock
     private ArticleRepository articleRepository;
+    @Mock
+    private UserAccountRepository userAccountRepository;
 
 
     /** 테스트 할 기능
@@ -66,12 +70,12 @@ class ArticleServiceTest {
         SearchType searchType = SearchType.TITLE;
         String searchKeyword = "title";
         Pageable pageable = Pageable.ofSize(20);
-        given(articleRepository.findByTitleContaining(searchKeyword, pageable)).willReturn(Page.empty());
+        given(articleRepository.findByTitleContainingIgnoreCase(searchKeyword, pageable)).willReturn(Page.empty());
         //When
         Page<ArticleDto> articles = sut.searchArticles(searchType, searchKeyword, pageable);
         //Then
         assertThat(articles).isEmpty();
-        then(articleRepository).should().findByTitleContaining(searchKeyword, pageable);
+        then(articleRepository).should().findByTitleContainingIgnoreCase(searchKeyword, pageable);
     }
 
     /* 게시글 선택*/
@@ -84,8 +88,8 @@ class ArticleServiceTest {
         given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
 
         //When
-        ArticleWithCommentsDto dto = sut.getArticle(articleId);
-
+//        ArticleWithCommentsDto dto = sut.getArticleWithComments(articleId);
+        ArticleDto dto = sut.getArticle(articleId);
         //Then
         assertThat(dto)
                 .hasFieldOrPropertyWithValue("title", article.getTitle())
@@ -143,11 +147,47 @@ class ArticleServiceTest {
     public void givenArticleId_whenDeleteArticle() {
         //Given
         Long articleId = 1L;
+        String userId = "bitstudy";
         willDoNothing().given(articleRepository).deleteById(articleId);
         //When
-        sut.deleteArticle(articleId);
+        sut.deleteArticle(articleId, userId);
         //Then
         then(articleRepository).should().deleteById(articleId);
+    }
+
+    @Test
+    @DisplayName("게시글 조회, 댓글 달린 게시글 반환")
+    void givenNothing_thenReturnArticleWithComment() {
+        //Given
+        Long articleId = 1l;
+        Article article = createArticle();
+        given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
+
+//        When
+        ArticleWithCommentsDto dto = sut.getArticleWithComments(articleId);
+
+//        Then
+        assertThat(dto).hasFieldOrPropertyWithValue("title", article.getTitle())
+                .hasFieldOrPropertyWithValue("content", article.getContent())
+                .hasFieldOrPropertyWithValue("hashtag", article.getHashtag());
+        then(articleRepository).should().findById(articleId);
+    }
+
+    @Test
+    @DisplayName("없는 게시글 조회, 예외 발생")
+    void givenNoneExistArticleId_whenSearchArticle_thenThrowsException() {
+        //Given
+        Long articleId = 0l;
+        given(articleRepository.findById(articleId)).willReturn(Optional.empty());
+
+        //When
+        Throwable t = Assertions.catchThrowable(() -> sut.getArticle(articleId));
+        //catchThrowable() : ()안에 예외 발생시킬 코드 넣기
+
+        //Then
+        assertThat(t).isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("게시글이 없습니다 - articleId:" + articleId);
+        then(articleRepository).should().findById(articleId);
     }
     private UserAccount createUserAccount() {
         return UserAccount.of(
@@ -173,30 +213,30 @@ class ArticleServiceTest {
     }
     private ArticleDto createArticleDto(String title, String content, String hashtag){
         return ArticleDto.of(
-                1L,
+//                1L,
                 createUserAccountDto(),
                 title,
                 content,
-                hashtag,
-                LocalDateTime.now(),
-                "bitgg",
-                LocalDateTime.now(),
-                "bitgg"
+                hashtag
+//                LocalDateTime.now(),
+//                "bitgg",
+//                LocalDateTime.now(),
+//                "bitgg"
         );
     }
 
     private UserAccountDto createUserAccountDto() {
         return UserAccountDto.of(
-                1L,
+//                1L,
                 "bitstudy",
                 "password",
                 "bitgg@email.com",
                 "bitgg",
-                "memos",
-                LocalDateTime.now(),
-                "bitgg",
-                LocalDateTime.now(),
-                "bitgg"
+                "memos"
+//                ,LocalDateTime.now(),
+//                "bitgg",
+//                LocalDateTime.now(),
+//                "bitgg"
         );
     }
 }

@@ -1,11 +1,16 @@
 package com.bitstudy.app.controller;
 
 import com.bitstudy.app.domain.Article;
+import com.bitstudy.app.domain.type.FormStatus;
 import com.bitstudy.app.domain.type.SearchType;
+import com.bitstudy.app.dto.ArticleDto;
+import com.bitstudy.app.dto.UserAccountDto;
+import com.bitstudy.app.dto.request.ArticleRequest;
 import com.bitstudy.app.dto.response.ArticleResponse;
 import com.bitstudy.app.dto.response.ArticleWithCommentsResponse;
 import com.bitstudy.app.service.ArticleService;
 import com.bitstudy.app.service.PaginationService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,10 +19,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -70,7 +72,7 @@ public class ArticleController {
 
     @GetMapping("/{articleId}")
     public String articleOne(@PathVariable Long articleId, ModelMap map){
-        ArticleWithCommentsResponse article = ArticleWithCommentsResponse.from(articleService.getArticle(articleId));
+        ArticleWithCommentsResponse article = ArticleWithCommentsResponse.from(articleService.getArticleWithComments(articleId));
 
 //        map.addAttribute("article", null);//테스트할때는 null말고 뭔가 넣어줘야함
 //        map.addAttribute("articleComments", List.of());
@@ -80,4 +82,25 @@ public class ArticleController {
         map.addAttribute("totalCount", articleService.getArticleCount());
         return "articles/detail";
     }
+    @GetMapping("/form")
+    public String articleForm(Model m) {
+        m.addAttribute("formStatus", FormStatus.CREATE);
+
+        return "articles/form";
+    }
+    @PostMapping("/form")
+    public String postNewArticle(ArticleRequest articleRequest) {
+        articleService.saveArticle(articleRequest.toDto(
+                UserAccountDto.of("bitstudy", "asdf", "bitstudy@email.com", "bitstudy", "vamos", null, null, null, null)
+        ));
+        return "redirect:/articles";
+    }
+
+//    @GetMapping("/{articleId}/form")
+//    public String updateArticleForm(@PathVariable Long articleId, Model m) {
+//     ArticleResponse article = ArticleResponse.from(articleService.getArticle(articleId));
+//      m.addAttribute("article", article);
+//      m.addAttribute("formStatus", FormStatus.UPDATE)
+//      return "article/form";
+//    }
 }

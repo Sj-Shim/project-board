@@ -119,29 +119,29 @@ class ArticleCommentServiceTest {
 
     private ArticleCommentDto createArticleCommentDto(String content) {
         return ArticleCommentDto.of(
+//                1L
                 1L
-                ,1L
                 , createUserAccountDto()
                 , content
-                , LocalDateTime.now()
-                , "bitstudy"
-                , LocalDateTime.now()
-                , "bitstudy"
+//                , LocalDateTime.now()
+//                , "bitstudy"
+//                , LocalDateTime.now()
+//                , "bitstudy"
         );
     }
 
     private UserAccountDto createUserAccountDto() {
         return UserAccountDto.of(
-                1L
-                , "bitstudy"
+//                1L
+                "bitstudy"
                 , "password"
                 , "bitstudy@email.com"
                 , "bitstudy"
                 , "memo"
-                , LocalDateTime.now()
-                , "bitstudy"
-                , LocalDateTime.now()
-                , "bitstudy"
+//                , LocalDateTime.now()
+//                , "bitstudy"
+//                , LocalDateTime.now()
+//                , "bitstudy"
         );
     }
 

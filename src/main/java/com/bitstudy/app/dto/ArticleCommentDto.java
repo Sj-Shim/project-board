@@ -15,16 +15,23 @@ public record ArticleCommentDto(
         LocalDateTime modifiedDate,
         String modifiedBy
 ) {
-    public static ArticleCommentDto of(Long id,
+//    public static ArticleCommentDto of(Long id,
+//                                       Long articleId,
+//                                       UserAccountDto userAccountDto,
+//                                       String content,
+//                                       LocalDateTime registerDate,
+//                                       String createdBy,
+//                                       LocalDateTime modifiedDate,
+//                                       String modifiedBy) {
+//        return new ArticleCommentDto(id, articleId, userAccountDto, content, registerDate, createdBy, modifiedDate, modifiedBy);
+//    }
+    public static ArticleCommentDto of(
                                        Long articleId,
                                        UserAccountDto userAccountDto,
-                                       String content,
-                                       LocalDateTime registerDate,
-                                       String createdBy,
-                                       LocalDateTime modifiedDate,
-                                       String modifiedBy) {
-        return new ArticleCommentDto(id, articleId, userAccountDto, content, registerDate, createdBy, modifiedDate, modifiedBy);
+                                       String content) {
+        return new ArticleCommentDto(null, articleId, userAccountDto, content, null, null, null, null);
     }
+
 
     public static ArticleCommentDto from(ArticleComment entity) {
         return new ArticleCommentDto(entity.getId(), entity.getArticle().getId(), UserAccountDto.from(entity.getUserAccount()), entity.getContent(), entity.getRegisterDate(), entity.getCreatedBy(), entity.getModifiedDate(), entity.getModifiedBy());

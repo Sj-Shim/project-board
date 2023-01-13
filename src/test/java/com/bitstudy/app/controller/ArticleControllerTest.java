@@ -3,8 +3,10 @@ package com.bitstudy.app.controller;
 import com.bitstudy.app.config.SecurityConfig;
 import com.bitstudy.app.domain.type.SearchType;
 import com.bitstudy.app.dto.ArticleCommentDto;
+import com.bitstudy.app.dto.ArticleDto;
 import com.bitstudy.app.dto.ArticleWithCommentsDto;
 import com.bitstudy.app.dto.UserAccountDto;
+import com.bitstudy.app.dto.request.ArticleRequest;
 import com.bitstudy.app.service.ArticleService;
 import com.bitstudy.app.service.PaginationService;
 import org.junit.jupiter.api.DisplayName;
@@ -25,7 +27,8 @@ import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /** 이 테스트 코드를 작성하고 실행시 결과적으로 404 발생
@@ -106,7 +109,7 @@ class ArticleControllerTest {
     void articlePage() throws Exception {
         Long articleId = 1L;
         long totalCount = 1l;
-        given(articleService.getArticle(articleId)).willReturn(createArticleWithCommentsDto());
+        given(articleService.getArticleWithComments(articleId)).willReturn(createArticleWithCommentsDto());
         given(articleService.getArticleCount()).willReturn(totalCount);
 
         mvc.perform(get("/articles/1"))
@@ -139,6 +142,25 @@ class ArticleControllerTest {
                 .andExpect(view().name("articles/search-hashtag"));
     }
 
+
+    @Test
+    @DisplayName("새 게시글 등록")
+    void givenNewArticleInfo_whenRequesting_thenSaveNewArticle() throws Exception {
+        //Given
+        ArticleRequest articleRequest = ArticleRequest.of("new title", "new content", "#new");
+        willDoNothing().given(articleService).saveArticle(any(ArticleDto.class));
+
+        //When
+        mvc.perform(
+                post("/articles/form").contentType(MediaType.APPLICATION_FORM_URLENCODED).with(csrf())
+        ).andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/articles"))
+                .andExpect(redirectedUrl("/articles"));
+
+        then(articleService).should().saveArticle(any(ArticleDto.class));
+    }
+
+
     private ArticleWithCommentsDto createArticleWithCommentsDto() {
         return ArticleWithCommentsDto.of(
                 1L,
@@ -157,16 +179,16 @@ class ArticleControllerTest {
 
     private UserAccountDto createUserAccountDto() {
         return UserAccountDto.of(
-                1L,
+//                1L,
                 "bitstudy",
                 "password",
                 "bitstudy@email.com",
                 "bitstudy",
-                "memo",
-                LocalDateTime.now(),
-                "bitstudy",
-                LocalDateTime.now(),
-                "bitstudy"
+                "memo"
+//                ,LocalDateTime.now(),
+//                "bitstudy",
+//                LocalDateTime.now(),
+//                "bitstudy"
         );
     }
 }
