@@ -127,18 +127,19 @@ class ArticleServiceTest {
     @Test
     public void givenArticleInfo_whenUpdateArticle() {
         //Given
+        Long articleId = 1l;
         ArticleDto dto = createArticleDto("title", "content", "#java");
         Article article = createArticle();
-        given(articleRepository.getReferenceById(dto.id())).willThrow(EntityNotFoundException.class);
+        given(articleRepository.getReferenceById(anyLong())).willThrow(EntityNotFoundException.class);
         // record는 별도의 getter를 만들지 않아도 됨. 일반 필드처럼 가져다 쓰면 됨.
         //When
-        sut.updateArticle(dto);
+        sut.updateArticle(anyLong(), dto);
         //Then
         assertThat(article)
                 .hasFieldOrPropertyWithValue("title", dto.title())
                 .hasFieldOrPropertyWithValue("content", dto.content())
                 .hasFieldOrPropertyWithValue("hashtag", dto.hashtag());
-        then(articleRepository).should().getReferenceById(dto.id());
+        then(articleRepository).should().getReferenceById(anyLong());
     }
 
     /* 게시글 삭제 */

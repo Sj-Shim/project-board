@@ -3,8 +3,8 @@
 
 -- 테스트 계정
 -- TODO: 비밀번호 노출됨. 추후 수정 필요
-insert into useraccount (userId, userPassword, nickname, email, memo, registerDate, createdBy, modifiedDate, modifiedBy) values ('bitstudy', 'asdf', 'bitstudy', 'bitstudy@email.com','I am bitstudy', now(), 'bitstudy', now(), 'bitstudy');
-insert into useraccount (userId, userPassword, nickname, email, memo, registerDate, createdBy, modifiedDate, modifiedBy) values ('goodjob', 'asdf', 'goodjob', 'goodjob@email.com','I am goodjob', now(), 'goodjob', now(), 'goodjob');
+insert into useraccount (userId, userPassword, nickname, email, memo, registerDate, createdBy, modifiedDate, modifiedBy) values ('bitstudy', '{noop}asdf', 'bitstudy', 'bitstudy@email.com','I am bitstudy', now(), 'bitstudy', now(), 'bitstudy');
+insert into useraccount (userId, userPassword, nickname, email, memo, registerDate, createdBy, modifiedDate, modifiedBy) values ('goodjob', '{noop}asdf', 'goodjob', 'goodjob@email.com','I am goodjob', now(), 'goodjob', now(), 'goodjob');
 
 -- 게시글(Article) 100 개
 insert into article (userId, title, content, hashtag, registerDate, createdBy, modifiedDate, modifiedBy) values ('goodjob','Integer a nibh.', 'Integer ac leo. Pellentesque ultrices mattis odio. Donec vitae nisi.', 'Yellow', '2022-06-20 17:00:33', 'Grayce', '2022-10-15 08:10:21', 'Keefer');

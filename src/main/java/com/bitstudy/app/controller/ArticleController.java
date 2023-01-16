@@ -122,7 +122,8 @@ public class ArticleController {
         //        "bitstudy", "asdf", "bitstudy@email.com", "bitstudy", "memo", null, null, null, null
         //)));
         //return "redirect:/articles/" + articleId;
-
+        System.out.println("articleId : " + articleId);
+        System.out.println("title:" + articleRequest.title());
         /*추가*/ articleService.updateArticle(articleId, articleRequest.toDto(boardPrincipal.toDto()));
         /* boardPrincipal.toDto() 가 userAccountDto 를 반환해준다.
          *   반환된 유저dto 를 articleRequest로 아티클dto로 또 바꿔서  updateArticle 로 보낸다.
