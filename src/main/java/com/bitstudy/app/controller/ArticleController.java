@@ -8,6 +8,7 @@ import com.bitstudy.app.dto.UserAccountDto;
 import com.bitstudy.app.dto.request.ArticleRequest;
 import com.bitstudy.app.dto.response.ArticleResponse;
 import com.bitstudy.app.dto.response.ArticleWithCommentsResponse;
+import com.bitstudy.app.security.BoardPrincipal;
 import com.bitstudy.app.service.ArticleService;
 import com.bitstudy.app.service.PaginationService;
 import lombok.Getter;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -96,11 +98,55 @@ public class ArticleController {
         return "redirect:/articles";
     }
 
-//    @GetMapping("/{articleId}/form")
-//    public String updateArticleForm(@PathVariable Long articleId, Model m) {
-//     ArticleResponse article = ArticleResponse.from(articleService.getArticle(articleId));
-//      m.addAttribute("article", article);
-//      m.addAttribute("formStatus", FormStatus.UPDATE)
-//      return "article/form";
-//    }
+    /* 게시글 수정화면 띄우기만 하기 */
+    @GetMapping("/{articleId}/form")
+    public String updateArticleForm(@PathVariable Long articleId, ModelMap map) {
+        ArticleResponse article = ArticleResponse.from(articleService.getArticle(articleId));
+
+        map.addAttribute("article", article);
+        map.addAttribute("formStatus", FormStatus.UPDATE);
+
+        return "articles/form";
+    }
+
+    /* 게시글 수정한거 DB에 업데이트 하기 */
+/* 새로 추가 - 게시글 수정할때도 사용자 인증을 받아야 한다.
+            유저 정보를 UserAccountDto.of를 통해서 임의로 만들어진 데이터를 사용했다.
+            그러나 이제 사용정보를 받아올수 있으니 boardPrincipal을 이용해서 정의할수 있다  */
+    @PostMapping("/{articleId}/form")
+    public String updateArticle(@PathVariable Long articleId,
+                                ArticleRequest articleRequest,
+            /*새로추가*/                     @AuthenticationPrincipal BoardPrincipal boardPrincipal
+    ){
+        /*삭제*/ //articleService.updateArticle(articleId, articleRequest.toDto(UserAccountDto.of(
+        //        "bitstudy", "asdf", "bitstudy@email.com", "bitstudy", "memo", null, null, null, null
+        //)));
+        //return "redirect:/articles/" + articleId;
+
+        /*추가*/ articleService.updateArticle(articleId, articleRequest.toDto(boardPrincipal.toDto()));
+        /* boardPrincipal.toDto() 가 userAccountDto 를 반환해준다.
+         *   반환된 유저dto 를 articleRequest로 아티클dto로 또 바꿔서  updateArticle 로 보낸다.
+         * */
+        return "redirect:/articles";
+    }
+
+
+    /* 게시글 삭제하기 */
+    /* 원래 delete 는 REST 방식에서는 delete 라고 했었지만 form 태그 쓸때는 get 과 Post만 허용되기 떄문에 어쩔수 없음. */
+    @PostMapping ("/{articleId}/delete")
+    public String deleteArticle(
+            @PathVariable Long articleId,
+
+            /* 추가 - 인증정보 가져온다.*/
+            @AuthenticationPrincipal BoardPrincipal boardPrincipal
+    ) {
+        // TODO: 인증 정보를 넣어줘야 한다.
+        /*삭제*///articleService.deleteArticle(articleId, userId);
+        /*추가*/articleService.deleteArticle(articleId, boardPrincipal.getUsername());
+
+        return "redirect:/articles";
+    }
+
+
+    /* 여기까지 하고 ArticleControllerTest 가서 전체 테스트 돌리면 다 통과함*/
 }

@@ -82,9 +82,9 @@ public class ArticleService {
         //toEntity를 이용해서 매개변수로 받은 dto(단순히 데이터를 가지고 있을 뿐, 누가 어떤 정보인지 모르는 상태)정보로부터 엔티티를 하나 만들어서 세이브 하는 코드
     }
 
-    public void updateArticle(ArticleDto dto) {
+    public void updateArticle(Long articleId, ArticleDto dto) {
         try {
-            Article article = articleRepository.getReferenceById(dto.id());
+            Article article = articleRepository.getReferenceById(articleId);
             UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
             if(article.getUserAccount().equals(userAccount)) {
 
@@ -103,7 +103,7 @@ public class ArticleService {
         }
     }
     /** 게시글 삭제 */
-    public void deleteArticle(Long articleId, String userId){
+    public void deleteArticle(long articleId, String userId){
         articleRepository.deleteByIdAndUserAccount_UserId(articleId, userId);
     }
 

@@ -2,6 +2,7 @@ package com.bitstudy.app.repository;
 
 import com.bitstudy.app.domain.Article;
 import com.bitstudy.app.domain.QArticle;
+import com.querydsl.core.types.dsl.DateTimeExpression;
 import com.querydsl.core.types.dsl.StringExpression;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,11 +50,12 @@ public interface ArticleRepository  extends
         *   including을 이용해서 title, content, createdBy, hashtag 검색 가능하게 만들기
         *   (id는 인증기능을 달아서 유저정보를 알아올 수 있을때 추가)
         *   including 사용법 : root.필드명*/
-        bindings.including(root.title, root.content, root.createdBy, root.hashtag);
+        bindings.including(root.title, root.content, root.registerDate, root.createdBy, root.hashtag);
         /* 3. 정확한 검색만 됐던 것을 'or검색' 가능하게 바꾸기*/
 //        bindings.bind(root.title).first(StringExpression::likeIgnoreCase);// like '%{문자열}' 로 들어감. %없이 들어가는거라서 수동으로 넣어줘야 함
         bindings.bind(root.title).first(StringExpression::containsIgnoreCase);
         bindings.bind(root.content).first(StringExpression::containsIgnoreCase);
+        bindings.bind(root.registerDate).first(DateTimeExpression::eq);
         bindings.bind(root.createdBy).first(StringExpression::containsIgnoreCase);
         bindings.bind(root.hashtag).first(StringExpression::containsIgnoreCase);
         //날짜를 검색할 경우 : bindings.bind(root.createdAt).first(DateTimeExpression::eq); 날짜니까 DateTimeExpression, eq는 equals(정확한검색), 날짜필드는 정확한 검색만 되도록 설정.
